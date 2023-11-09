@@ -6,6 +6,9 @@ app = Flask(__name__)
 CORS(app)  # Add this line to enable CORS for your Flask app
 CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000"]}})
 
+dataset = None  # Initialize the dataset as a global variable
+ref = None  # Initialize the ref variable as a global variable
+
 @app.route('/api/receive', methods=['POST'])
 def receive_strings():
     data = request.get_json()
@@ -26,16 +29,21 @@ def receive_RefImage():
     if "Ref" in data and isinstance(data["Ref"], str):
         # Access the 'data' key in the received JSON
         received_data = data["Ref"]
+        global ref
         ref = received_data
         return jsonify({"message": "okay received", "refImage" : ref})
     else:
         return jsonify({"error": "Invalid input format"}), 400
 
-# Define a new route to access the manipulated data
 @app.route('/api/get_dataset', methods=['GET'])
 def get_dataset():
     global dataset
     return jsonify({"dataset": dataset})
+
+@app.route('/api/get_ref', methods=['GET'])
+def get_ref():
+    global ref
+    return jsonify({"refImage": ref})
 
 
 if __name__ == '__main__':
