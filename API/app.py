@@ -1,6 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # Import the CORS module
+from Texture import *
 
+class ImageVal:
+    def __init__(self, Image:str, Val:float):
+        self.Image = Image
+        self.Val = Val
+
+    def to_dict(self):
+       return {
+           'Image': self.Image,
+           'Val': self.Val
+       }
 
 app = Flask(__name__)
 CORS(app)  # Add this line to enable CORS for your Flask app
@@ -8,6 +19,16 @@ CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000"]}})
 
 dataset = None  # Initialize the dataset as a global variable
 ref = None  # Initialize the ref variable as a global variable
+def pangkasBase64(base64: str):
+   # Split the string at the first comma
+   split_string = base64.split(',', 1)
+   
+   # Return the part of the string after the first comma
+   if len(split_string) > 1:
+       return split_string[1].strip()
+   else:
+       return base64
+   
 
 @app.route('/api/receive', methods=['POST'])
 def receive_strings():
@@ -17,7 +38,7 @@ def receive_strings():
         received_data = data["data"]
 
         global dataset
-        # Manipulate the data (for example, you can reverse the list)
+        print("why hello there")
         dataset = received_data
         return jsonify({"message": "okay received", "dataset" : dataset})
     else:
@@ -30,10 +51,20 @@ def receive_RefImage():
         # Access the 'data' key in the received JSON
         received_data = data["Ref"]
         global ref
-        ref = received_data
-        return jsonify({"message": "okay received", "refImage" : ref})
-    else:
-        return jsonify({"error": "Invalid input format"}), 400
+        ref = pangkasBase64(received_data)
+        refTexture = getTexture(ref)
+        pairData =[]
+        for i in dataset:
+            textureI = getTexture(pangkasBase64(i))
+            pair = ImageVal(pangkasBase64(i),cosSim(refTexture,textureI))
+            pairData.append(pair.to_dict())
+        pairData = sorted(pairData, key=lambda d: d['Val'], reverse=True)
+        return jsonify({"message": "Hasil dari berdasarkan texture", "pair_values" : pairData})
+        # if dataset is not None and len(dataset)>0:
+        #     HasilTexture = compareImage(ref,dataset[0])
+        #     return jsonify({"message": "Hasil dari berdasarkan texture", "Hasil_Texture" : HasilTexture}) #ganti dengan hasil actual
+        # else:
+        #     return jsonify({"error": "Invalid input format"}), 400
 
 @app.route('/api/get_dataset', methods=['GET'])
 def get_dataset():
@@ -48,4 +79,5 @@ def get_ref():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 

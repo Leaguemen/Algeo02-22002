@@ -1,9 +1,12 @@
 import base64
 import math
+from flask_cors import CORS
 
 import numpy as np
 from io import BytesIO
 from PIL import Image
+
+
 
 def grayscaled(elmt):
     #terima tuple 3 elemen (r,g,b) dan return floor value grayscalednya
@@ -25,9 +28,9 @@ def getTexture(str):
     # return tuple 3 elemen: (contrast,homogeneity,entropy)
 
     # convert base64 to image
-    # img_decoded = base64.b64decode(str)
-    # img_file = BytesIO(img_decoded)
-    img = Image.open(str)
+    img_decoded = base64.b64decode(str)
+    img_file = BytesIO(img_decoded)
+    img = Image.open(img_file)
     #img.show() #cek image sesuai
 
     # get image rgb and dimension
@@ -77,9 +80,3 @@ def compareImage(b64_1, b64_2):
     similarity = cosSim(vector1,vector2)
 
     return similarity
-
-img_1 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/tiger1.jpg"
-img_3 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/apel.jpg"
-img_2 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/dog.jpg"
-img_4 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/gajah.jpg"
-print(compareImage(img_4,img_3))

@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
+import Switch from "react-switch";
 import logo from "./logo.svg";
 import "./App.css";
 import Title from "./components/Title";
@@ -11,7 +12,6 @@ function App() {
 
   // Callback function to update refimage
   const handleRefImageChange = async (newImage: string | null) => {
-    console.log(newImage);
     setRefImage(newImage);
   };
 
@@ -89,6 +89,13 @@ function App() {
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const [switchChecked, setSwitchChecked] = useState(false);
+
+  const handleSwitchChange = (checked: boolean) => {
+    setSwitchChecked(checked);
+    // You can add code here to perform actions when the switch is toggled
   };
 
   return (
