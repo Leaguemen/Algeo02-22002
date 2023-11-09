@@ -10,7 +10,8 @@ function App() {
   const dataSetImage: string[] = [];
 
   // Callback function to update refimage
-  const handleRefImageChange = (newImage: string | null) => {
+  const handleRefImageChange = async (newImage: string | null) => {
+    console.log(newImage);
     setRefImage(newImage);
   };
 
@@ -31,7 +32,7 @@ function App() {
             console.log(dataSetImage.length);
             console.log(dataSetImage);
             //sendPostRequest
-            await sendPostRequest();
+            await sendPostDataset();
           }
         };
 
@@ -41,20 +42,45 @@ function App() {
     }
   };
 
-  const sendPostRequest = async () => {
+  const sendPostDataset = async () => {
     try {
-      const response = await fetch("http://localhost:5000/process_array", {
+      const response = await fetch("http://127.0.0.1:5000/api/receive", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          set: dataSetImage,
+          data: dataSetImage,
         }),
       });
 
       if (response.ok) {
         const responseBody = await response.json(); // Parse the response body as JSON
+        console.log("POST request successful");
+        console.log("Response Body:", responseBody); // Print the response body
+      } else {
+        console.error("POST request failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const sendPostRefImage = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/RefImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Ref: refimage,
+        }),
+      });
+
+      if (response.ok) {
+        const responseBody = await response.json(); // Parse the response body as JSON
+        console.log(refimage);
         console.log("POST request successful");
         console.log("Response Body:", responseBody); // Print the response body
       } else {
@@ -77,7 +103,7 @@ function App() {
       />
       <hr />
       <ImgButton onImageChange={handleRefImageChange} />
-      <button onClick={sendPostRequest}> Send Reference Image </button>
+      <button onClick={sendPostRefImage}> Send Reference Image </button>
     </div>
   );
 }
