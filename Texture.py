@@ -21,24 +21,20 @@ def cosSim(vec1, vec2):
     len2 = math.sqrt((vec2[0]**2)+(vec2[1]**2)+(vec2[2]**2))
     return dot/(len1*len2)
 
-def getTexture(str):
+def getTexture(loc):
     # return tuple 3 elemen: (contrast,homogeneity,entropy)
 
     # convert base64 to image
-    # img_decoded = base64.b64decode(str)
-    # img_file = BytesIO(img_decoded)
-    img = Image.open(str)
+    img = Image.open(loc)
     #img.show() #cek image sesuai
 
-    # get image rgb and dimension
-    img_arr = np.array(img)
-    height = img_arr.shape[0]
-    width = img_arr.shape[1]
+    width, height = img.size
+    #print(width,height)
 
     # create matrix of grayscale value
-    gray_arr = [[grayscaled(img_arr[i,j]) for j in range(width)] for i in range(height)] 
-    gray_arr = np.array(gray_arr)
-    # test_im = Image.fromarray(gray_arr) # cek grayscale sesuai
+    gray_arr = [[grayscaled(img.getpixel((j,i))) for j in range(width)] for i in range(height)] 
+    # gray_arr = np.array(gray_arr) # cek grayscale sesuai
+    # test_im = Image.fromarray(gray_arr) 
     # test_im.show()
 
     # create co-occurance Matrix
@@ -46,22 +42,26 @@ def getTexture(str):
     #distance = 0, angle = 0
     for i in range(height):
         for j in range(width-1):
-            coMatrix[gray_arr[i,j]][gray_arr[i,j+1]] += 1
-    # bisa di optimalisasi
-    coMatrix = np.array(coMatrix)
-    coMatrixT = coMatrix.transpose()
-    symMatrix = np.add(coMatrix,coMatrixT) #add co-occurance matrix dengan transposenya
-    #symMatrix == glcm
+            coMatrix[gray_arr[i][j]][gray_arr[i][j+1]] += 1
+    # symMatrix = np.array(coMatrix)
+
     glcmSum = 0
     for i in range(256):
-        for j in range(256):
-            glcmSum += symMatrix[i,j]
+        for j in range(i+1):
+            if (i==j):
+                coMatrix[i][j] *= 2
+                glcmSum += coMatrix[i][j]
+            else:
+                temp = coMatrix[i][j]
+                coMatrix[i][j] += coMatrix[j][i]
+                coMatrix[j][i] += temp
+                glcmSum += coMatrix[i][j]*2
 
     # calculate contrast, homogeneity, entropy
     contrast, homogeneity, entropy = 0, 0, 0
     for i in range(256):
         for j in range(256):
-            p = (symMatrix[i,j]/glcmSum)
+            p = (coMatrix[i][j]/glcmSum)
             d = (i-j)
             contrast += p*(d**2)
             homogeneity += p/(1+(d**2))
