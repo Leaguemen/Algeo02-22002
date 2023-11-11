@@ -7,17 +7,24 @@ import time
 
 
 def get_rgb_array_from_image(str):
+# menerima path gambar
+# mengembalikan array 2D berisi RGB
 
     # convert base64 to image
     # img_decoded = base64.b64decode(str)
     # img_file = BytesIO(img_decoded)
-    image = Image.open(str)
     # img.show() #cek image sesuai
+    image = Image.open(str)
 
-    # resize image to 510 x 510 px (biar pas pembagian blocknya)
-    resized_image = image.resize((510, 510))
+    image = Image.open(str)
+
+    # resize image (agar pas pembagian blocknya)
+    resized_image = image.resize((512, 512))
+
+    # mengambil hanya nilai RGB (karena format file mungkin bukan .jpg)
+    rgb_resized_image = resized_image.convert("RGB")
     
-    return np.array(resized_image)
+    return np.array(rgb_resized_image)
 
 
 def get_c_max(norm_rgb):
@@ -83,6 +90,9 @@ def rgb_to_hsv(rgb):
 
 
 def create_hsv_array_from_rgb_array(rgb_array):
+# menerima array 2D berisi RGB
+# mengembalikan array 2D berisi HSV
+
     hsv_array = np.empty((rgb_array.shape[0], rgb_array.shape[1]), dtype=np.ndarray)
     for i in range(0, rgb_array.shape[0]):
         for j in range(0, rgb_array.shape[1]):
@@ -92,46 +102,63 @@ def create_hsv_array_from_rgb_array(rgb_array):
 
 
 def create_blocks_hsv_array(hsv_array):
-# Membagi matriks 510x510 menjadi blok-blok berukuran 3x3,
+# Membagi matriks 512x512 menjadi blok-blok berukuran 4x4,
 # lalu menghitung rata-rata nilai hsv dari tiap-tiap blok
-    blocks_hsv_array = np.empty((hsv_array.shape[0] // 3, hsv_array.shape[1] // 3), dtype=np.ndarray)
-    for i in range(0, hsv_array.shape[0], 3):
-        for j in range(0, hsv_array.shape[1], 3):
+
+    blocks_hsv_array = np.empty((4, 4), dtype=np.ndarray)
+    for i in range(0, hsv_array.shape[0], hsv_array.shape[0] // 4):
+        for j in range(0, hsv_array.shape[1], hsv_array.shape[1] // 4):
             sum_hsv = np.zeros(3)
-            for k in range(i, i + 3):
-                for l in range(j, j + 3):
-                    # sum_hsv += hsv_array[k][l]
+            for k in range(i, i + hsv_array.shape[0] // 4):
+                for l in range(j, j + hsv_array.shape[1] // 4):
                     sum_hsv = np.add(sum_hsv, hsv_array[k][l])
             
-            average_hsv = np.divide(sum_hsv, 9)
-            blocks_hsv_array[i // 3][j // 3] = average_hsv
+            average_hsv = np.divide(sum_hsv, (hsv_array.shape[0] // 4) * (hsv_array.shape[1] // 4))
+            blocks_hsv_array[i // (hsv_array.shape[0] // 4)][j // (hsv_array.shape[1] // 4)] = average_hsv
     
     return blocks_hsv_array
 
 
 def cos_similarity(hsv1, hsv2):
+# menerima 2 buah HSV
+# mengembalikan nilai cosine similarity antara 2 buah HSV
+
     dot_product = hsv1[0] * hsv2[0] + hsv1[1] * hsv2[1] + hsv1[2] * hsv2[2]
     norm_hsv1 = math.sqrt(hsv1[0] ** 2 + hsv1[1] ** 2 + hsv1[2] ** 2)
     norm_hsv2 = math.sqrt(hsv2[0] ** 2 + hsv2[1] ** 2 + hsv2[2] ** 2)
     return dot_product / (norm_hsv1 * norm_hsv2)
 
 
-def compare_image_by_color(src_img1, src_img2):
-    blocks_hsv_array1 = create_blocks_hsv_array(create_hsv_array_from_rgb_array(get_rgb_array_from_image(src_img1)))
-    blocks_hsv_array2 = create_blocks_hsv_array(create_hsv_array_from_rgb_array(get_rgb_array_from_image(src_img2)))
+def average_cos_similarity(blocks_hsv_array1, blocks_hsv_array2):
+# menerima 2 buah array 2D berisi nilai rata-rata nilai HSV dari tiap-tiap blok gambar
+# menjumlahkan nilai cosine similarity dari setiap elemen di dalam array 2D,
+# kemudian mengembalikan nilai rata-rata cosine similarity
+
     total_cos_similarity = 0
     for i in range(blocks_hsv_array1.shape[0]):
         for j in range(blocks_hsv_array1.shape[1]):
-            x = cos_similarity(blocks_hsv_array1[i][j], blocks_hsv_array2[i][j])
-            # print(x)
-            total_cos_similarity += x
+            total_cos_similarity += cos_similarity(blocks_hsv_array1[i][j], blocks_hsv_array2[i][j])
     
     return total_cos_similarity / (blocks_hsv_array1.shape[0] * blocks_hsv_array1.shape[1])
 
 
-start = time.time()
-result = compare_image_by_color("dataset/100.jpg", "dataset/100.jpg")
-end = time.time()
+def compare_image_by_color(path_image1, path_image2):
+# menerima 2 buah path gambar
+# mengembalikan hasil perbandingan kedua gambar
+    
+    rgb_array1 = get_rgb_array_from_image(path_image1)
+    hsv_array1 = create_hsv_array_from_rgb_array(rgb_array1)
+    blocks_hsv_array1 = create_blocks_hsv_array(hsv_array1)
 
-print(result)
-print("waktu eksekusi:", end - start, "detik")
+    rgb_array2 = get_rgb_array_from_image(path_image2)
+    hsv_array2 = create_hsv_array_from_rgb_array(rgb_array2)
+    blocks_hsv_array2 = create_blocks_hsv_array(hsv_array2)
+
+    result = average_cos_similarity(blocks_hsv_array1, blocks_hsv_array2)
+    
+    return result
+
+
+path_image1 = "dataset/0.jpg"
+path_image2 = "dataset/1.jpg"
+print("cos similarity:", compare_image_by_color(path_image1, path_image2))
