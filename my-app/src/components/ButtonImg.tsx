@@ -23,15 +23,39 @@ function ImgButton({ onImageChange }: ImgButtonProps) {
   };
 
   return (
-    <div>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
+    <div
+      style={{ marginBottom: "20px", marginTop: "20px", textAlign: "center" }}
+    >
       {selectedImage && (
         <img
           src={selectedImage}
           alt="Selected Image"
-          style={{ maxWidth: "30%" }}
+          style={{ maxWidth: "100%", marginTop: "10px", borderRadius: "8px" }}
         />
       )}
+      <label
+        htmlFor="imageInput"
+        style={{
+          cursor: "pointer",
+          padding: "10px",
+          border: "2px solid #3498db",
+          borderRadius: "8px",
+          backgroundColor: "#3498db",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          marginTop: "10px",
+        }}
+      >
+        Choose Image
+        <input
+          type="file"
+          id="imageInput"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+      </label>
     </div>
   );
 }

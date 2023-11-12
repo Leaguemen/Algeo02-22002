@@ -82,4 +82,4 @@ img_1 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/tiger1.jpg"
 img_3 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/apel.jpg"
 img_2 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/dog.jpg"
 img_4 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/gajah.jpg"
-print(compareImage(img_4,img_3))
+print(compareImage(img_1,img_2))

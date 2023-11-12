@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # Import the CORS module
 from Texture import *
+from color import *
+
 
 class ImageVal:
     def __init__(self, Image:str, Val:float):
@@ -47,19 +49,25 @@ def receive_strings():
 @app.route('/api/RefImage', methods=['POST'])
 def receive_RefImage():
     data = request.get_json()
-    if "Ref" in data and isinstance(data["Ref"], str):
+    if "Ref" and "Type" in data and isinstance(data["Ref"], str):
         # Access the 'data' key in the received JSON
         received_data = data["Ref"]
+        type = data["Type"]
         global ref
         ref = pangkasBase64(received_data)
-        refTexture = getTexture(ref)
         pairData =[]
-        for i in dataset:
-            textureI = getTexture(pangkasBase64(i))
-            pair = ImageVal(pangkasBase64(i),cosSim(refTexture,textureI))
-            pairData.append(pair.to_dict())
+        if type == False:
+            refTexture = getTexture(ref)
+            for i in dataset:
+                textureI = getTexture(pangkasBase64(i))
+                pair = ImageVal(pangkasBase64(i),cosSim(refTexture,textureI))
+                pairData.append(pair.to_dict())
+        else:
+            for i in dataset:
+                pair = ImageVal(pangkasBase64(i),average_cos_similarity(ref,pangkasBase64(i)))
+                pairData.append(pair.to_dict())          
         pairData = sorted(pairData, key=lambda d: d['Val'], reverse=True)
-        return jsonify({"message": "Hasil dari berdasarkan texture", "pair_values" : pairData})
+        return jsonify({"message": "Hasil", "pair_values" : pairData,"state": type})
         # if dataset is not None and len(dataset)>0:
         #     HasilTexture = compareImage(ref,dataset[0])
         #     return jsonify({"message": "Hasil dari berdasarkan texture", "Hasil_Texture" : HasilTexture}) #ganti dengan hasil actual
