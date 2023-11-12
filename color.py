@@ -6,17 +6,15 @@ import math
 import time
 
 
-def get_rgb_array_from_image(str):
-# menerima path gambar
+def get_rgb_array_from_image(base64_image):
+# menerima gambar dalam bentuk string base64
 # mengembalikan array 2D berisi RGB
 
     # convert base64 to image
-    # img_decoded = base64.b64decode(str)
-    # img_file = BytesIO(img_decoded)
-    # img.show() #cek image sesuai
-    image = Image.open(str)
-
-    image = Image.open(str)
+    decoded_image = base64.b64decode(base64_image)
+    file_image = BytesIO(decoded_image)
+    image = Image.open(file_image)
+    # image.show() #cek image sesuai
 
     # resize image (agar pas pembagian blocknya)
     resized_image = image.resize((512, 512))
@@ -27,30 +25,30 @@ def get_rgb_array_from_image(str):
     return np.array(rgb_resized_image)
 
 
-def get_c_max(norm_rgb):
+def get_c_max(normalized_rgb):
 # menerima array rgb yang sudah dinormalisasi
 # mengembalikan nilai Cmax
     
-    c_max = norm_rgb[0]
-    if norm_rgb[1] > c_max:
-        c_max = norm_rgb[1]
+    c_max = normalized_rgb[0]
+    if normalized_rgb[1] > c_max:
+        c_max = normalized_rgb[1]
 
-    if norm_rgb[2] > c_max:
-        c_max = norm_rgb[2]
+    if normalized_rgb[2] > c_max:
+        c_max = normalized_rgb[2]
 
     return c_max
 
 
-def get_c_min(norm_rgb):
+def get_c_min(normalized_rgb):
 # menerima array rgb yang sudah dinormalisasi
 # mengembalikan nilai Cmin
     
-    c_min = norm_rgb[0]
-    if norm_rgb[1] < c_min:
-        c_min = norm_rgb[1]
+    c_min = normalized_rgb[0]
+    if normalized_rgb[1] < c_min:
+        c_min = normalized_rgb[1]
 
-    if norm_rgb[2] < c_min:
-        c_min = norm_rgb[2]
+    if normalized_rgb[2] < c_min:
+        c_min = normalized_rgb[2]
 
     return c_min
 
@@ -60,22 +58,22 @@ def rgb_to_hsv(rgb):
 # mengembalikan hsv, yaitu array dengan 3 elemen: hue, saturation, value
     
     # Normalize rgb
-    norm_rgb = np.divide(rgb, 255)
+    normalized_rgb = np.divide(rgb, 255)
 
     # Calculate Cmax, Cmin, and delta
-    c_max = get_c_max(norm_rgb)
-    c_min = get_c_min(norm_rgb)
+    c_max = get_c_max(normalized_rgb)
+    c_min = get_c_min(normalized_rgb)
     delta = c_max - c_min
     
     # Menghitung nilai H (hue)
     if delta == 0:
         hue = 0
-    elif c_max == norm_rgb[0]:
-        hue = 60 * (((norm_rgb[1] - norm_rgb[2]) / delta) % 6) 
-    elif c_max == norm_rgb[1]:
-        hue = 60 * (((norm_rgb[2] - norm_rgb[0]) / delta) + 2)
+    elif c_max == normalized_rgb[0]:
+        hue = 60 * (((normalized_rgb[1] - normalized_rgb[2]) / delta) % 6) 
+    elif c_max == normalized_rgb[1]:
+        hue = 60 * (((normalized_rgb[2] - normalized_rgb[0]) / delta) + 2)
     else:
-        hue = 60 * (((norm_rgb[0] - norm_rgb[1]) / delta) + 4)
+        hue = 60 * (((normalized_rgb[0] - normalized_rgb[1]) / delta) + 4)
     
     # Menghitung nilai S (saturation)
     if c_max == 0:
@@ -93,6 +91,7 @@ def create_hsv_array_from_rgb_array(rgb_array):
 # menerima array 2D berisi RGB
 # mengembalikan array 2D berisi HSV
 
+    # vectorized_rgb_to_hsv = np.vectorize(rgb_to_hsv, otypes=[np.ndarray])
     hsv_array = np.empty((rgb_array.shape[0], rgb_array.shape[1]), dtype=np.ndarray)
     for i in range(0, rgb_array.shape[0]):
         for j in range(0, rgb_array.shape[1]):
@@ -146,19 +145,31 @@ def compare_image_by_color(path_image1, path_image2):
 # menerima 2 buah path gambar
 # mengembalikan hasil perbandingan kedua gambar
     
+    # Memproses gambar 1
     rgb_array1 = get_rgb_array_from_image(path_image1)
     hsv_array1 = create_hsv_array_from_rgb_array(rgb_array1)
     blocks_hsv_array1 = create_blocks_hsv_array(hsv_array1)
 
+    # Memproses gambar 2
     rgb_array2 = get_rgb_array_from_image(path_image2)
     hsv_array2 = create_hsv_array_from_rgb_array(rgb_array2)
     blocks_hsv_array2 = create_blocks_hsv_array(hsv_array2)
 
+    # Membandingkan gambar 1 dan gambar 2 dengan cosine similarity
     result = average_cos_similarity(blocks_hsv_array1, blocks_hsv_array2)
     
     return result
 
 
-path_image1 = "dataset/0.jpg"
-path_image2 = "dataset/1.jpg"
-print("cos similarity:", compare_image_by_color(path_image1, path_image2))
+file1 = open("img2_base64.txt")
+file2 = open("img4_base64.txt")
+image1 = file1.read()
+image2 = file2.read()
+file1.close
+file2.close
+
+start = time.time()
+print("cos similarity:", compare_image_by_color(image1, image2))
+finish = time.time()
+
+print(finish - start, "seconds")
