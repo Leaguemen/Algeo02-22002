@@ -14,9 +14,8 @@ def get_rgb_array_from_image(base64_image):
     decoded_image = base64.b64decode(base64_image)
     file_image = BytesIO(decoded_image)
     image = Image.open(file_image)
-    # image.show() #cek image sesuai
 
-    # resize image (agar pas pembagian blocknya)
+    # resize image (agar pembagian blocknya pas)
     resized_image = image.resize((512, 512))
 
     # mengambil hanya nilai RGB (karena format file mungkin bukan .jpg)
@@ -87,24 +86,11 @@ def rgb_to_hsv(rgb):
     return np.array([hue, saturation, value])
 
 
-def create_hsv_array_from_rgb_array(rgb_array):
-# menerima array 2D berisi RGB
-# mengembalikan array 2D berisi HSV
-
-    # vectorized_rgb_to_hsv = np.vectorize(rgb_to_hsv, otypes=[np.ndarray])
-    hsv_array = np.empty((rgb_array.shape[0], rgb_array.shape[1]), dtype=np.ndarray)
-    for i in range(0, rgb_array.shape[0]):
-        for j in range(0, rgb_array.shape[1]):
-            hsv_array[i][j] = rgb_to_hsv(rgb_array[i][j])
-    
-    return hsv_array
-
-
-def create_blocks_hsv_array(hsv_array):
+def create_blocks_array(hsv_array):
 # Membagi matriks 512x512 menjadi blok-blok berukuran 4x4,
-# lalu menghitung rata-rata nilai hsv dari tiap-tiap blok
+# lalu menghitung rata-rata warna dalam blok tersebut
 
-    blocks_hsv_array = np.empty((4, 4), dtype=np.ndarray)
+    blocks_array = np.empty((4, 4), dtype=np.ndarray)
     for i in range(0, hsv_array.shape[0], hsv_array.shape[0] // 4):
         for j in range(0, hsv_array.shape[1], hsv_array.shape[1] // 4):
             sum_hsv = np.zeros(3)
@@ -113,9 +99,17 @@ def create_blocks_hsv_array(hsv_array):
                     sum_hsv = np.add(sum_hsv, hsv_array[k][l])
             
             average_hsv = np.divide(sum_hsv, (hsv_array.shape[0] // 4) * (hsv_array.shape[1] // 4))
-            blocks_hsv_array[i // (hsv_array.shape[0] // 4)][j // (hsv_array.shape[1] // 4)] = average_hsv
+            blocks_array[i // (hsv_array.shape[0] // 4)][j // (hsv_array.shape[1] // 4)] = average_hsv
     
-    return blocks_hsv_array
+    return blocks_array
+
+
+def create_hsv_array_from_rgb_array(rgb_array):
+# menerima array 2D berisi RGB
+# mengembalikan array 2D berisi HSV
+    
+    hsv_array = np.array([[rgb_to_hsv(j) for j in i] for i in rgb_array])
+    return hsv_array
 
 
 def cos_similarity(hsv1, hsv2):
@@ -129,8 +123,8 @@ def cos_similarity(hsv1, hsv2):
 
 
 def average_cos_similarity(blocks_hsv_array1, blocks_hsv_array2):
-# menerima 2 buah array 2D berisi nilai rata-rata nilai HSV dari tiap-tiap blok gambar
-# menjumlahkan nilai cosine similarity dari setiap elemen di dalam array 2D,
+# menerima 2 buah array 2D berisi rata-rata nilai HSV dari setiap blok gambar
+# menjumlahkan nilai cosine similarity dari setiap elemen di dalam array 2D tersebut,
 # kemudian mengembalikan nilai rata-rata cosine similarity
 
     total_cos_similarity = 0
@@ -141,19 +135,19 @@ def average_cos_similarity(blocks_hsv_array1, blocks_hsv_array2):
     return total_cos_similarity / (blocks_hsv_array1.shape[0] * blocks_hsv_array1.shape[1])
 
 
-def compare_image_by_color(path_image1, path_image2):
-# menerima 2 buah path gambar
+def compare_image_by_color(base64_image1, base64_image2):
+# menerima 2 buah gambar dalam format base64
 # mengembalikan hasil perbandingan kedua gambar
-    
+
     # Memproses gambar 1
-    rgb_array1 = get_rgb_array_from_image(path_image1)
-    hsv_array1 = create_hsv_array_from_rgb_array(rgb_array1)
-    blocks_hsv_array1 = create_blocks_hsv_array(hsv_array1)
+    rgb_array1 = get_rgb_array_from_image(base64_image1)
+    blocks_rgb_array1 = create_blocks_array(rgb_array1)
+    blocks_hsv_array1 = create_hsv_array_from_rgb_array(blocks_rgb_array1)
 
     # Memproses gambar 2
-    rgb_array2 = get_rgb_array_from_image(path_image2)
-    hsv_array2 = create_hsv_array_from_rgb_array(rgb_array2)
-    blocks_hsv_array2 = create_blocks_hsv_array(hsv_array2)
+    rgb_array2 = get_rgb_array_from_image(base64_image2)
+    blocks_rgb_array2 = create_blocks_array(rgb_array2)
+    blocks_hsv_array2 = create_hsv_array_from_rgb_array(blocks_rgb_array2)
 
     # Membandingkan gambar 1 dan gambar 2 dengan cosine similarity
     result = average_cos_similarity(blocks_hsv_array1, blocks_hsv_array2)
@@ -161,8 +155,10 @@ def compare_image_by_color(path_image1, path_image2):
     return result
 
 
-file1 = open("img2_base64.txt")
-file2 = open("img4_base64.txt")
+
+
+file1 = open("2_base64.txt")
+file2 = open("7_base64.txt")
 image1 = file1.read()
 image2 = file2.read()
 file1.close
@@ -171,3 +167,5 @@ file2.close
 start = time.time()
 print("cos similarity:", compare_image_by_color(image1, image2))
 finish = time.time()
+print(finish - start, "seconds")
+
