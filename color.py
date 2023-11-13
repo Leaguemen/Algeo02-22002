@@ -157,8 +157,8 @@ def compare_image_by_color(base64_image1, base64_image2):
 
 
 
-file1 = open("2_base64.txt")
-file2 = open("7_base64.txt")
+file1 = open("sample_images/2_base64.txt")
+file2 = open("sample_images/7_base64.txt")
 image1 = file1.read()
 image2 = file2.read()
 file1.close
