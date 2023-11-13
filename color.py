@@ -161,6 +161,7 @@ file1 = open("sample_images/2_base64.txt")
 file2 = open("sample_images/7_base64.txt")
 image1 = file1.read()
 image2 = file2.read()
+print(type(image1))
 file1.close
 file2.close
 

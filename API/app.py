@@ -3,6 +3,11 @@ from flask_cors import CORS  # Import the CORS module
 from Texture import *
 from color import *
 
+def getColor(base64):
+    rgb_array = get_rgb_array_from_image(base64)
+    blocks_rgb_array = create_blocks_array(rgb_array)
+    block_hsv_array = create_hsv_array_from_rgb_array(blocks_rgb_array)
+    return block_hsv_array
 
 class ImageVal:
     def __init__(self, Image:str, Val:float):
@@ -55,17 +60,24 @@ def receive_RefImage():
         type = data["Type"]
         global ref
         ref = pangkasBase64(received_data)
+        print(ref)
         pairData =[]
         if type == False:
             refTexture = getTexture(ref)
             for i in dataset:
                 textureI = getTexture(pangkasBase64(i))
                 pair = ImageVal(pangkasBase64(i),cosSim(refTexture,textureI))
-                pairData.append(pair.to_dict())
+                if not math.isnan(pair.Val):
+                    pair.Val = round((pair.Val*100),2)
+                    pairData.append(pair.to_dict())    
         else:
-            for i in dataset:
-                pair = ImageVal(pangkasBase64(i),average_cos_similarity(ref,pangkasBase64(i)))
-                pairData.append(pair.to_dict())          
+            refColor = getColor(ref)
+            for i in range(len(dataset)):
+                ColorI = getColor(pangkasBase64(dataset[i]))
+                pair = ImageVal(pangkasBase64(dataset[i]),average_cos_similarity(refColor,ColorI))
+                if not math.isnan(pair.Val):
+                    pair.Val = round((pair.Val*100),2)
+                    pairData.append(pair.to_dict())          
         pairData = sorted(pairData, key=lambda d: d['Val'], reverse=True)
         return jsonify({"message": "Hasil", "pair_values" : pairData,"state": type})
         # if dataset is not None and len(dataset)>0:

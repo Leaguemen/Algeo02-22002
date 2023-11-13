@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import logo from "./logo.svg";
+import { Link, Route, BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
 import Title from "./components/Title";
 import ImgButton from "./components/ButtonImg";
@@ -187,6 +187,25 @@ function App() {
         {" "}
         Search{" "}
       </button>
+      <a
+        href="extrapage.html"
+        style={{
+          position: "fixed",
+          bottom: "10px",
+          right: "10px",
+          cursor: "pointer",
+          padding: "10px",
+          border: "2px solid #3498db",
+          borderRadius: "8px",
+          backgroundColor: "#3498db",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          textDecoration: "none", // Remove default link underline
+        }}
+      >
+        UwU apa ini ?!
+      </a>
       <div className="imageGrid">
         {visibleImages &&
           visibleImages.map((item: PairValue, index: number) => (
@@ -195,7 +214,7 @@ function App() {
                 src={`data:image/jpg;base64,${item.Image}`}
                 alt={`Image ${index}`}
               />
-              <p>{item.Val}</p>
+              <p>{item.Val}%</p>
             </div>
           ))}
       </div>
