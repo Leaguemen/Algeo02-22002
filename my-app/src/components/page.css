@@ -1,0 +1,25 @@
+/* AboutUs.css */
+
+.about-us-text {
+    max-width: 600px; /* Adjust the maximum width as needed */
+    font-size: 20px;
+    margin: 0 auto; /* Center the text */
+    text-align: justify;
+  }
+  
+  .team-members {
+    list-style-type:circle;
+    padding: 0;
+  }
+  
+li {
+    margin-bottom: 10px;
+  }
+  
+  ol{
+    font-size: 20px;
+    max-width: 600px;
+    text-align: justify;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }

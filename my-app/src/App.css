@@ -46,7 +46,7 @@ body {
 
 .imageGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
@@ -157,4 +157,26 @@ body {
 
 .pagination span {
   font-size: 16px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  background-color: #3498db;
+  padding: 10px;
+}
+
+.nav-button {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-button:hover {
+  background-color: #fff;
+  color: #3498db;
 }

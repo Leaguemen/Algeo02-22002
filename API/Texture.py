@@ -16,7 +16,7 @@ def grayscaled(elmt):
 
 def cosSim(vec1, vec2):
     #return cos(theta) antara 2 vector
-    dot = vec1[0]*vec2[0]+vec1[1]+vec2[1]+vec1[2]+vec2[2]
+    dot = (vec1[0]*vec2[0])+(vec1[1]*vec2[1])+(vec1[2]*vec2[2])
     len1 = math.sqrt((vec1[0]**2)+(vec1[1]**2)+(vec1[2]**2))
     len2 = math.sqrt((vec2[0]**2)+(vec2[1]**2)+(vec2[2]**2))
     return dot/(len1*len2)
@@ -34,7 +34,11 @@ def getTexture(loc):
     #print(width,height)
 
     # create matrix of grayscale value
-    gray_arr = [[grayscaled(img.getpixel((j,i))) for j in range(width)] for i in range(height)] 
+    if (len(img.mode) < 3):
+        gray_arr = [[img.getpixel((j,i)) for j in range(width)] for i in range(height)]
+    else :
+        gray_arr = [[grayscaled(img.getpixel((j,i))) for j in range(width)] for i in range(height)] 
+    gray_arr = np.array(gray_arr)    
     # gray_arr = np.array(gray_arr) # cek grayscale sesuai
     # test_im = Image.fromarray(gray_arr) 
     # test_im.show()
@@ -67,8 +71,8 @@ def getTexture(loc):
             d = (i-j)
             contrast += p*(d**2)
             homogeneity += p/(1+(d**2))
-            if (p > 0):
-                entropy += p*(math.log(p,10))
+            if (p != 0):
+                entropy -= p*(math.log(p))
                 
     return (contrast,homogeneity,entropy)
 
@@ -79,4 +83,3 @@ def compareImage(b64_1, b64_2):
     similarity = cosSim(vector1,vector2)
 
     return similarity
-

@@ -1,9 +1,11 @@
 import React, { ChangeEvent, useState } from "react";
-import { Link, Route, BrowserRouter as Router } from "react-router-dom";
+import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import Title from "./components/Title";
 import ImgButton from "./components/ButtonImg";
-import Switch from "./components/switch";
+import AboutUs from "./components/AboutUs";
+import Concepts from "./components/Concepts";
+import HowToUse from "./components/HowToUse";
 
 function App() {
   interface PairValue {
@@ -142,101 +144,139 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <Title />
-      <hr />
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={handleDataSetChange}
-        style={{
-          cursor: "pointer",
-          padding: "10px",
-          border: "2px solid #3498db",
-          borderRadius: "8px",
-          backgroundColor: "#3498db",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          marginTop: "10px",
-          display: "inline-block", // Align with the visual style of the button
-        }}
-      />
-      <div className="switch-container">
-        <label className="switch">
-          <input type="checkbox" onChange={handleChange} />
-          <span className="slider"></span>
-        </label>
-        <span className="switch-label">
-          {isChecked ? "By Color" : "By Texture"}
-        </span>
+    <Router>
+      <div className="App">
+        <nav className="navbar">
+          <Link to="/" className="nav-button">
+            Home
+          </Link>
+          <Link to="/about-us" className="nav-button">
+            About Us
+          </Link>
+          <Link to="/concepts" className="nav-button">
+            Concepts
+          </Link>
+          <Link to="/how-to-use" className="nav-button">
+            How to Use
+          </Link>
+        </nav>
+
+        <Routes>
+          <Route
+            path="/about-us"
+            element={
+              <div>
+                <AboutUs />
+              </div>
+            }
+          />
+          <Route
+            path="/concepts"
+            element={
+              <div>
+                <Concepts />
+              </div>
+            }
+          />
+          <Route
+            path="/how-to-use"
+            element={
+              <div>
+                <HowToUse />
+              </div>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <div>
+                <Title />
+                <hr />
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleDataSetChange}
+                  // @ts-ignore
+                  webkitdirectory="true"
+                  mozdirectory="true"
+                  style={{
+                    cursor: "pointer",
+                    padding: "10px",
+                    border: "2px solid #3498db",
+                    borderRadius: "8px",
+                    backgroundColor: "#3498db",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    marginTop: "10px",
+                    display: "inline-block", // Align with the visual style of the button
+                  }}
+                />
+                <div className="switch-container">
+                  <label className="switch">
+                    <input type="checkbox" onChange={handleChange} />
+                    <span className="slider"></span>
+                  </label>
+                  <span className="switch-label">
+                    {isChecked ? "By Color" : "By Texture"}
+                  </span>
+                </div>
+                <hr />
+                <ImgButton onImageChange={handleRefImageChange} />
+                <button
+                  onClick={sendPostRefImage}
+                  style={{
+                    cursor: "pointer",
+                    padding: "5px 10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    backgroundColor: "#f0f0f0",
+                  }}
+                >
+                  {" "}
+                  Search{" "}
+                </button>
+                <div className="imageGrid">
+                  {visibleImages &&
+                    visibleImages.map((item: PairValue, index: number) => (
+                      <div key={index} className="imageContainer">
+                        <img
+                          src={`data:image/jpg;base64,${item.Image}`}
+                          alt={`Image ${index}`}
+                        />
+                        <p>{item.Val}%</p>
+                      </div>
+                    ))}
+                </div>
+                <div className="pagination">
+                  <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                    Previous
+                  </button>
+                  <span>{`Page ${currentPage} of ${totalPages}`}</span>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+                <div>
+                  {processTime !== null && (
+                    <p>
+                      Processing time: {processTime.toFixed(2)} milliseconds
+                    </p>
+                  )}
+                  {responseData && (
+                    <p>Number of elements: {responseData.pair_values.length}</p>
+                  )}
+                </div>
+              </div>
+            }
+          />
+        </Routes>
       </div>
-      <hr />
-      <ImgButton onImageChange={handleRefImageChange} />
-      <button
-        onClick={sendPostRefImage}
-        style={{
-          cursor: "pointer",
-          padding: "5px 10px",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          backgroundColor: "#f0f0f0",
-        }}
-      >
-        {" "}
-        Search{" "}
-      </button>
-      <a
-        href="extrapage.html"
-        style={{
-          position: "fixed",
-          bottom: "10px",
-          right: "10px",
-          cursor: "pointer",
-          padding: "10px",
-          border: "2px solid #3498db",
-          borderRadius: "8px",
-          backgroundColor: "#3498db",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          textDecoration: "none", // Remove default link underline
-        }}
-      >
-        UwU apa ini ?!
-      </a>
-      <div className="imageGrid">
-        {visibleImages &&
-          visibleImages.map((item: PairValue, index: number) => (
-            <div key={index} className="imageContainer">
-              <img
-                src={`data:image/jpg;base64,${item.Image}`}
-                alt={`Image ${index}`}
-              />
-              <p>{item.Val}%</p>
-            </div>
-          ))}
-      </div>
-      <div className="pagination">
-        <button onClick={handlePrevPage} disabled={currentPage === 1}>
-          Previous
-        </button>
-        <span>{`Page ${currentPage} of ${totalPages}`}</span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-          Next
-        </button>
-      </div>
-      <div>
-        {processTime !== null && (
-          <p>Processing time: {processTime.toFixed(2)} milliseconds</p>
-        )}
-        {responseData && (
-          <p>Number of elements: {responseData.pair_values.length}</p>
-        )}
-      </div>
-    </div>
+    </Router>
   );
 }
-
 export default App;

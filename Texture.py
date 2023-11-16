@@ -29,7 +29,7 @@ def getTexture(loc):
     #img.show() #cek image sesuai
 
     width, height = img.size
-    #print(width,height)
+
 
     # create matrix of grayscale value
     if (len(img.mode) < 3):
@@ -81,9 +81,3 @@ def compareImage(b64_1, b64_2):
     similarity = cosSim(vector1,vector2)
 
     return similarity
-
-img_1 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/tiger1.jpg"
-img_3 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/apel.jpg"
-img_2 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/dog.jpg"
-img_4 = "C:/Users/Sean Nugroho/Pictures/gambarbuattesalgeo/gajah.jpg"
-print(compareImage(img_1,img_2))

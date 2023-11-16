@@ -45,7 +45,6 @@ def receive_strings():
         received_data = data["data"]
 
         global dataset
-        print("why hello there")
         dataset = received_data
         return jsonify({"message": "okay received", "dataset" : dataset})
     else:
@@ -60,14 +59,13 @@ def receive_RefImage():
         type = data["Type"]
         global ref
         ref = pangkasBase64(received_data)
-        print(ref)
         pairData =[]
         if type == False:
             refTexture = getTexture(ref)
             for i in dataset:
                 textureI = getTexture(pangkasBase64(i))
                 pair = ImageVal(pangkasBase64(i),cosSim(refTexture,textureI))
-                if not math.isnan(pair.Val):
+                if not math.isnan(pair.Val) :
                     pair.Val = round((pair.Val*100),2)
                     pairData.append(pair.to_dict())    
         else:
@@ -80,11 +78,6 @@ def receive_RefImage():
                     pairData.append(pair.to_dict())          
         pairData = sorted(pairData, key=lambda d: d['Val'], reverse=True)
         return jsonify({"message": "Hasil", "pair_values" : pairData,"state": type})
-        # if dataset is not None and len(dataset)>0:
-        #     HasilTexture = compareImage(ref,dataset[0])
-        #     return jsonify({"message": "Hasil dari berdasarkan texture", "Hasil_Texture" : HasilTexture}) #ganti dengan hasil actual
-        # else:
-        #     return jsonify({"error": "Invalid input format"}), 400
 
 @app.route('/api/get_dataset', methods=['GET'])
 def get_dataset():
