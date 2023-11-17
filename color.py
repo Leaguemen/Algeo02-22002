@@ -78,10 +78,10 @@ def rgb_to_hsv(rgb):
     if c_max == 0:
         saturation = 0
     else:
-        saturation = delta / c_max
+        saturation = (delta / c_max) * 100
     
     # Menghitung nilai V (value)
-    value = c_max
+    value = c_max * 100
 
     return np.array([hue, saturation, value])
 
