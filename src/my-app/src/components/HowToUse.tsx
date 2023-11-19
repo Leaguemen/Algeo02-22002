@@ -3,7 +3,7 @@ import "./page.css";
 
 function HowToUse() {
   return (
-    <div>
+    <div className="cara">
       <h1>How to Use</h1>
       <hr></hr>
       <ol>

@@ -1,6 +1,6 @@
 /* AboutUs.css */
 
-.about-us-text {
+.about{
     max-width: 600px; /* Adjust the maximum width as needed */
     font-size: 20px;
     margin: 0 auto; /* Center the text */
@@ -11,7 +11,20 @@
     list-style-type:circle;
     padding: 0;
   }
-  
+
+  .konsep{
+    max-width: 600px; /* Adjust the maximum width as needed */
+    font-size: 20px;
+    margin: 0 auto; /* Center the text */
+    text-align: justify;
+  }
+
+  .cara{
+    max-width: 600px; /* Adjust the maximum width as needed */
+    font-size: 20px;
+    margin: 0 auto; /* Center the text */
+    text-align: justify;
+  }
 li {
     margin-bottom: 10px;
   }
