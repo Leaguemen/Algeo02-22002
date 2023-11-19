@@ -12,7 +12,7 @@ function AboutUs() {
         bukan Linear" yang beranggotakan:
         <ul className="team-members">
           <li>Ariel Herfrison (13522002)</li>
-          <li>Bastian H.S. (maaf nim kurang tau)</li>
+          <li>Bastian H.S. (13522034)</li>
           <li>Venantius Sean Ardi Nugroho (13522078)</li>
           kami adalah sekelompok orang yang sebenarnya jarang berinteraksi
           sebelum tugas ini tapi karena niat kita dalam menyelamatkan nilai
