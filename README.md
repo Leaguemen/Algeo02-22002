@@ -37,9 +37,21 @@ Komparasi gambar dengan dataset berdasarkan:
 
 
 ## Setup
-What are the project requirements/dependencies? Where are they listed? A requirements.txt or a Pipfile.lock file perhaps? Where is it located?
+Sebelum Anda menjalankan website ini , pastikan beberapa hal telah diinstal, ini beberapa command untuk menginstall file yang perlu:
 
-Proceed to describe how to install / setup one's local environment / get started with the project.
+1. npm install
+2. npm install react-router-dom --save
+3. pip install flask
+4. pip install PIL
+5. pip install Flask-Cors
+
+Berikut adalah cara membuka websitenya :
+
+1. cd src/API
+2. python app.py
+3. buka terminal baru
+4. cd src/my-app
+5. npm start
 
 
 ## Usage
